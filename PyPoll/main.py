@@ -1,27 +1,80 @@
-'''In this Challenge, you are tasked with helping a small, rural town modernize its vote-counting process.
+# import modules and name essential variables
 
-You will be given a set of poll data called election_data.csv. The dataset is composed of three columns: "Voter ID", "County", and "Candidate". Your task is to create a Python script that analyzes the votes and calculates each of the following values:
+import csv
+import os
+totalvotes = 0
 
-The total number of votes cast
+#create dictionary for storing votes against candidate name
 
-A complete list of candidates who received votes
+candvotes = {}
 
-The percentage of votes each candidate won
+# assign filepath
 
-The total number of votes each candidate won
+election_data = os.path.join("Resources/election_data.csv")
 
-The winner of the election based on popular vote
+# assign how to read
 
-Your analysis should align with the following results:
+with open(election_data) as csvfile:
+    election_data_csv = csv.reader(csvfile, delimiter=',')
 
-Election Results
--------------------------
-Total Votes: 369711
--------------------------
-Charles Casper Stockham: 23.049% (85213)
-Diana DeGette: 73.812% (272892)
-Raymon Anthony Doane: 3.139% (11606)
--------------------------
-Winner: Diana DeGette
--------------------------
-In addition, your final script should both print the analysis to the terminal and export a text file with the results.'''
+# separate first row as headers
+
+    election_data_header = next(election_data_csv)
+
+# use for loop to look at each row
+
+    for row in election_data_csv:
+
+        #add one to total votes counter
+
+        candname = str(row[2])
+        totalvotes += 1
+
+        #if vote is for an existing candidate, add one vote
+
+        if candname in candvotes.keys():
+            candvotes[candname] += 1
+        
+        #else, add the candidate to the dictionary
+
+        else:
+            candvotes.update({candname: 1})
+
+    #print results
+            
+    print("Election Results")
+    print("-------------------------")
+    print("Total Votes: " + str(totalvotes))
+    print("-------------------------")
+
+    for key,value in candvotes.items():
+        candperc = (value/totalvotes)*100
+        print(key + ": "  + str(round(candperc,3)) + "% (" + str(value) + ")")
+
+    winner = max(candvotes, key=candvotes.get)
+
+    print("-------------------------")
+    print("Winner: " + winner)
+    print("-------------------------")
+
+
+    #output results to text file in /analysis
+
+    outputfile = "analysis/election_analysis.txt"
+
+    with open(outputfile, 'w') as output:
+        
+        print("Election Results", file=output)
+        print("-------------------------", file=output)
+        print("Total Votes: " + str(totalvotes), file=output)
+        print("-------------------------", file=output)
+
+        for key,value in candvotes.items():
+            candperc = (value/totalvotes)*100
+            print(key + ": "  + str(round(candperc,3)) + "% (" + str(value) + ")", file=output)
+
+        winner = max(candvotes, key=candvotes.get)
+
+        print("-------------------------", file=output)
+        print("Winner: " + winner, file=output)
+        print("-------------------------", file=output)
